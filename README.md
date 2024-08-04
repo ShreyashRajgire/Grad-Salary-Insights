@@ -1,6 +1,6 @@
 # Recent-Grads-Salary-Analysis
 
-This repository contains a comprehensive analysis of recent graduate salaries in the United States. The analysis aims to uncover insights into the factors influencing salary variations, with a particular focus on major category, gender representation, and popularity of different majors.
+This repository contains a comprehensive analysis of recent graduate salaries in the United States, leveraging data from the Tidy Tuesday project (2018-10-16). The analysis aims to uncover insights into the factors influencing salary variations, with a particular focus on major category, gender representation, and popularity of different majors.
 
 ## Motivation
 
@@ -8,7 +8,7 @@ Understanding the relationship between educational choices and earning potential
 
 ## Dataset
 
-The analysis utilizes the `recent-grads.csv` dataset. This dataset contains information on recent graduates from various colleges and universities in the United States, including details about their majors, salaries, employment rates, and demographic characteristics.
+The analysis utilizes the `recent-grads.csv` dataset from the Tidy Tuesday project. This dataset contains information on recent graduates from various colleges and universities in the United States, including details about their majors, salaries, employment rates, and demographic characteristics.
 
 ## Analysis
 
@@ -31,6 +31,7 @@ To answer these questions, the analysis employs various statistical and visualiz
 * **There is a statistically significant negative correlation between the share of women in a major and its median salary.**
 * **The most popular majors, such as business and psychology, do not necessarily command the highest salaries.**
 * **Gender disparities are evident in certain major categories, with engineering and computer science dominated by men, while education and health professions have a higher proportion of women.**
+
 
 ## Visualizations
 
