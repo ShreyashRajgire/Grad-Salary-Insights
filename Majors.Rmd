@@ -1,0 +1,134 @@
+---
+title: "Majors"
+output: html_document
+date: "2024-03-20"
+---
+
+#libraries
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(plotly)
+```
+#read csv file
+```{r}
+data <-read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-10-16/recent-grads.csv")
+```
+
+
+
+# Box plot
+```{r BOX PLOT}
+data %>%
+  ggplot(aes(x = reorder(Major_category, Median), y = Median)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+# Most earning major categories according to Median
+```{r BAR GRAPH}
+data %>%
+  group_by(Major_category) %>%
+  summarise(median = median(Median)) %>%
+  arrange(desc(median)) %>%
+  ggplot(aes(x = reorder(Major_category, median), y = median)) +
+  geom_col() +
+  coord_flip()
+```
+
+# what are the highest earning majors
+```{r}
+data %>% select(Major,Major_category,Median,P25th,P75th) %>% filter(Major_category>=100)%>% head(20) %>%  ggplot()+ geom_point(mapping = aes(reorder(Major,Median),Median,colour=Major_category))+ coord_flip()
+```
+
+# what are the lowest earning majors
+```{r}
+data %>%
+  select(Major_category, Median, Major) %>% tail(20)%>%
+  ggplot() +
+  geom_point(mapping = aes(x = reorder(Major,-Median), y = Median))+coord_flip() 
+```
+
+# Most common majors categories-
+```{r}
+data %>%
+  select(Major_category, Total) %>%
+  group_by(Major_category) %>%
+  summarise(Total = sum(Total, na.rm = TRUE)) %>%
+  arrange(desc(Total)) %>%
+  ggplot() +
+  geom_col(mapping = aes(x = reorder(Major_category, Total), y = Total,fill= Major_category)) +
+  coord_flip()+ labs(x = "")+theme(legend.position = "none")
+```
+
+
+
+# What are the most common majors
+```{r}
+data %>% select(Major, Total) %>%group_by(Major) %>% summarise(Total = sum(Total, na.rm = TRUE)) %>% arrange(desc(Total)) %>% head(20)%>% ggplot()+ geom_col(mapping = aes(reorder(Major,Total),Total , fill = Major)) + coord_flip() + theme(legend.position="none")
+```
+
+# comparison of men and women , Major wise
+```{r}
+data %>%
+  group_by(Major) %>%
+  summarise(men = sum(Men),
+            women = sum(Women),
+            total = sum(men + women)) %>% arrange(desc(total)) %>% head(20) %>%
+  gather(key = "gender", value = "count", men, women) %>%
+  ggplot(aes(x = reorder(Major,count), y = count, fill = gender)) +
+  geom_bar(stat = "identity", position = "stack") +
+  coord_flip()
+
+```
+
+
+# share of women major category wise
+```{r}
+by_majorcategory <- data %>%
+  group_by(Major_category) %>%
+  summarise(men = sum(Men, na.rm = TRUE),
+            women = sum(Women, na.rm = TRUE),
+            total = sum(Total, na.rm = TRUE),
+            median_salary = sum(Sample_size * Median, na.rm=TRUE) / sum(Sample_size)) %>%
+  mutate(tshare_women = women / total) %>%
+  arrange(desc(tshare_women))
+
+```
+
+#median salaries vs share of women ,major category wise
+```{r}
+library(ggrepel)
+
+by_majorcategory %>%
+  ggplot(mapping = aes(x = tshare_women, y = median_salary)) +
+  geom_point() +
+  geom_text(mapping = aes( label = Major_category), nudge_x = 0.05, nudge_y = 0.05) + geom_smooth(method="lm")
+
+```
+
+
+#median salaries vs share of women ,major wise
+```{r}
+ G<-data %>% group_by(Major) %>% summarise(men=sum(Men),
+                                      women= sum(ShareWomen),
+                                      median=sum(Median),
+                                      Major_category=Major_category,
+                                      Sample_size=Sample_size,
+                                      Major=Major) %>%mutate(Major_category=fct_lump(Major_category,4)) %>% arrange(desc(median)) %>% 
+  ggplot(mapping = aes(x = women, y = median, colour= Major_category, size=Sample_size , label=Major))+geom_point() + geom_smooth(aes(group=1),method="lm") 
+
+ggplotly(G)
+
+```
+
+
+#regression model of sharewomen on the salary
+```{r}
+data %>%
+  group_by(Major) %>%
+  select(Major, ShareWomen, Sample_size, Median) %>%
+  as.data.frame() %>%
+  lm(formula = Median ~ ShareWomen, weights = Sample_size) %>% summary()
+
+```
